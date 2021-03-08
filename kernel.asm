@@ -50,7 +50,24 @@ LABEL_BEGIN:
      mov   es, ax
      mov   ss, ax
      mov   sp, 0100h
-
+     ;calculate memeory 
+ComputeMemory:
+  mov ebx, 0 
+  mov di, MemChKBuf
+.loop:
+  mov eax, 0e820h
+  mov ecx, 20
+  mov edx, 0534d4150h
+  int 15h
+  jc LABEL_MEM_CHK_FAIL
+  add di, 20
+  inc dword [dwMCRNumber]
+  cmp ebx, 0
+  jne .loop
+  jmp LABEL_MEM_CHK_OK
+LABEL_MEM_CHK_FAIL:
+  mov dword [dwMCRNumber], 0
+LABEL_MEM_CHK_OK:
      mov   al, 0x13
      mov   ah, 0
      int   0x10
@@ -268,12 +285,18 @@ mouseHandler equ _mouseHandler - $$
         popfd
         ret
 
-  
+    get_memory_block_count:
+        mov eax, [dwMCRNumber];
+        ret 
+    get_adr_buffer:
+        mov eax, MemChKBuf;
+        ret
 
 %include "fontData.inc"
 
 SegCode32Len   equ  $ - LABEL_SEG_CODE32
-
+MemChKBuf: times 256 db 0
+dwMCRNumber: dd 0
 [SECTION .gs]
 ALIGN 32
 [BITS 32]

@@ -16,5 +16,5 @@ all : $(subst .c,.func,$(wildcard *.c))
 
 clean :
 	cp kernel.asm kernel.bak
-	rm -rf *.asm *.o *.func
+	rm -rf *.asm *.o *.func *.bat
 	mv kernel.bak kernel.asm 
